@@ -20,6 +20,17 @@ const words = [
   new Word(canvas), // right
 ];
 
+function requestFullscreen() {
+  if (canvas.requestFullscreen) {
+    canvas.requestFullscreen();
+  } else if (canvas.webkitRequestFullscreen) {
+    canvas.webkitRequestFullscreen(); // Safari
+  } else if (canvas.msRequestFullscreen) {
+    canvas.msRequestFullscreen(); // IE11
+  }
+}
+
+
 const resize = () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -34,6 +45,7 @@ window.addEventListener("resize", resize);
 resize();
 
 canvas.addEventListener("pointerdown", (e) => {
+  requestFullscreen();
   const rect = canvas.getBoundingClientRect();
   const pointerX = e.clientX - rect.left;
   const pointerY = e.clientY - rect.top;
