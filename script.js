@@ -45,12 +45,12 @@ window.addEventListener("resize", resize);
 resize();
 
 canvas.addEventListener("pointerdown", (e) => {
-  requestFullscreen();
   const rect = canvas.getBoundingClientRect();
   const pointerX = e.clientX - rect.left;
   const pointerY = e.clientY - rect.top;
-
+  
   if (button.isClicked(pointerX, pointerY)) {
+    requestFullscreen();
     words.forEach(word => word.hide()); // Hide all words when animation starts
 
     let elapsed = 0;
