@@ -99,7 +99,7 @@ function startArrowAnimation() {
       isAnimating = false;
 
       if (Level.mode === "hard") {
-        const options = ["Nothing", "yellow", "green", "purple", "blue", "red", "pink"];
+        const options = ["😔   😔😔   😔", "😊yellow😊", "😊green😊", "😊purple😊", "😊blue😊", "😊red😊", "pink"];
         const text = options[Math.floor(Math.random() * options.length)];
         const color = arrow.color;
 
