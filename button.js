@@ -1,5 +1,5 @@
 export default class Button {
-  constructor(canvas, label = "Go") {
+  constructor(canvas, label = "Play") {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.label = label;
@@ -16,6 +16,10 @@ export default class Button {
       const dist = Math.hypot(mouseX - this.x, mouseY - this.y);
       this.isHovered = dist <= this.radius;
     });
+  }
+
+  setLabel(label) {
+    this.label = label;
   }
 
   render() {
