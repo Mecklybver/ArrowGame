@@ -1,16 +1,18 @@
-export const sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+export const sharedAudioCtx = new (window.AudioContext ||
+  window.webkitAudioContext)();
 import Level from "./level.js";
 
 export default class Arrow {
   constructor(canvas) {
-    this.direction = Math.random() < 0.5 ? 'left' : 'right';
-    this.colors = ['black', 'yellow', 'green', 'purple', 'blue', 'red', 'pink'];
+    this.direction = Math.random() < 0.5 ? "left" : "right";
+    this.colors = ["black", "yellow", "green", "purple", "blue", "red", "pink"];
+    
     this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-     if (Level.mode === "numbers") {
-       this.color = "black";
-     } else {
-       this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-     }
+    if (Level.mode === "numbers") {
+      this.color = "black";
+    } else {
+      this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+    }
 
     this.size = 100;
     this.tailLength = 70;
@@ -23,11 +25,13 @@ export default class Arrow {
     this.gap = 10;
   }
 
+  
+
   playTone() {
     const oscillator = sharedAudioCtx.createOscillator();
     const gainNode = sharedAudioCtx.createGain();
 
-    oscillator.type = 'sine';
+    oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(110, sharedAudioCtx.currentTime);
     gainNode.gain.setValueAtTime(0.9, sharedAudioCtx.currentTime); // slightly quieter
 
@@ -35,11 +39,23 @@ export default class Arrow {
     gainNode.connect(sharedAudioCtx.destination);
 
     oscillator.start();
-    gainNode.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.2);
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.001,
+      sharedAudioCtx.currentTime + 0.2
+    );
     oscillator.stop(sharedAudioCtx.currentTime + 0.2);
   }
 
-  drawArrow(ctx, x, y, size, tailLength, tailThickness, color, roundCaps = false) {
+  drawArrow(
+    ctx,
+    x,
+    y,
+    size,
+    tailLength,
+    tailThickness,
+    color,
+    roundCaps = false
+  ) {
     ctx.save();
     ctx.translate(x, y);
 

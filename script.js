@@ -4,6 +4,7 @@ import { sharedAudioCtx } from "./arrow.js";
 import Level from "./level.js";
 import Word from "./word.js";
 import { Number } from "./number.js";
+import { Color } from "./color.js";
 
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
@@ -13,6 +14,7 @@ document.body.appendChild(canvas);
 
 let arrow = null;
 const button = new Button(canvas);
+const color = new Color()
 const level = new Level(canvas);
 const numberLevel = new Number();
 const words = [
@@ -138,6 +140,9 @@ function startArrowAnimation() {
       } else if (Level.mode === "numbers") {
         arrow.color = "black";
         numberLevel.playSound();
+      } else if (Level.mode === "easy") {
+          color.playAudio({ color: arrow.color, colors: arrow.colors });
+
       }
     } else {
       run();
