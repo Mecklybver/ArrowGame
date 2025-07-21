@@ -83,6 +83,9 @@ function startArrowAnimation() {
   let elapsed = 0;
   const duration = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000;
   const interval = Math.floor(Math.random() * (180 - 60 + 1)) + 60;
+  if (level.mode = = "numbers") {
+    interval = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
+  }
 
   const run = () => {
     arrow = new Arrow(canvas);
