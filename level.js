@@ -30,9 +30,13 @@ export default class Level {
       const mouseY = e.clientY - rect.top;
 
       if (this.isClicked(mouseX, mouseY)) {
-        Level.mode = Level.mode === "easy" ? "hard" : "easy";
+        const modes = ["easy", "hard", "numbers"];
+        let currentIndex = modes.indexOf(Level.mode);
+        currentIndex = (currentIndex + 1) % modes.length;
+        Level.mode = modes[currentIndex];
         this.label = Level.mode.charAt(0).toUpperCase() + Level.mode.slice(1);
       }
+
     });
   }
 

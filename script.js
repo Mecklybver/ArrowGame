@@ -3,6 +3,7 @@ import Button from "./button.js";
 import { sharedAudioCtx } from "./arrow.js";
 import Level from "./level.js";
 import Word from "./word.js";
+import { Number } from "./number.js";
 
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
@@ -13,6 +14,7 @@ document.body.appendChild(canvas);
 let arrow = null;
 const button = new Button(canvas);
 const level = new Level(canvas);
+const numberLevel = new Number();
 const words = [
   new Word(canvas), // top
   new Word(canvas), // bottom
@@ -54,15 +56,14 @@ window.addEventListener("resize", resize);
 resize();
 
 canvas.addEventListener("pointerdown", (e) => {
-  
   const rect = canvas.getBoundingClientRect();
   const pointerX = e.clientX - rect.left;
   const pointerY = e.clientY - rect.top;
 
   if (button.isClicked(pointerX, pointerY)) {
     if (button.label === "Play") {
-  button.setLabel("Go");
-}
+      button.setLabel("Go");
+    }
 
     if (isAnimating) return;
 
@@ -77,11 +78,11 @@ canvas.addEventListener("pointerdown", (e) => {
 
 function startArrowAnimation() {
   isAnimating = true;
-  words.forEach(word => word.hide());
+  words.forEach((word) => word.hide());
 
   let elapsed = 0;
-  const duration = Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000;
-  const interval = Math.floor(Math.random() * (200 - 50 + 1)) + 50;
+  const duration = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000;
+  const interval = Math.floor(Math.random() * (180 - 60 + 1)) + 60;
 
   const run = () => {
     arrow = new Arrow(canvas);
@@ -99,18 +100,41 @@ function startArrowAnimation() {
       isAnimating = false;
 
       if (Level.mode === "hard") {
-        const options = ["😔   😔😔   😔", "yellow", "green", "purple", "blue", "red", "pink"];
+        const options = [
+          "😔   😔😔   😔",
+          "yellow",
+          "green",
+          "purple",
+          "blue",
+          "red",
+          "pink",
+        ];
         const text = options[Math.floor(Math.random() * options.length)];
         const color = arrow.color;
 
         // Top
         words[0].setWord(text, canvas.width / 2, 40, color, 0);
         // Bottom
-        words[1].setWord(text, canvas.width / 2, canvas.height - 40, color, Math.PI);
+        words[1].setWord(
+          text,
+          canvas.width / 2,
+          canvas.height - 40,
+          color,
+          Math.PI
+        );
         // Left
         words[2].setWord(text, 40, canvas.height / 2, color, -Math.PI / 2);
         // Right
-        words[3].setWord(text, canvas.width - 40, canvas.height / 2, color, Math.PI / 2);
+        words[3].setWord(
+          text,
+          canvas.width - 40,
+          canvas.height / 2,
+          color,
+          Math.PI / 2
+        );
+      } else if (Level.mode === "numbers") {
+        arrow.color = "black";
+        numberLevel.playSound();
       }
     } else {
       run();
@@ -130,7 +154,10 @@ function playFinalTone() {
   gainNode.connect(sharedAudioCtx.destination);
 
   oscillator.start();
-  gainNode.gain.exponentialRampToValueAtTime(0.001, sharedAudioCtx.currentTime + 0.4);
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.001,
+    sharedAudioCtx.currentTime + 0.4
+  );
   oscillator.stop(sharedAudioCtx.currentTime + 0.4);
 }
 
@@ -140,7 +167,7 @@ const animate = () => {
   if (arrow) arrow.render(ctx);
   button.render();
   level.render();
-  words.forEach(word => word.render());
+  words.forEach((word) => word.render());
   requestAnimationFrame(animate);
 };
 

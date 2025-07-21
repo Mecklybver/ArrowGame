@@ -1,10 +1,16 @@
 export const sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+import Level from "./level.js";
 
 export default class Arrow {
   constructor(canvas) {
     this.direction = Math.random() < 0.5 ? 'left' : 'right';
     this.colors = ['black', 'yellow', 'green', 'purple', 'blue', 'red', 'pink'];
     this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+     if (Level.mode === "numbers") {
+       this.color = "black";
+     } else {
+       this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+     }
 
     this.size = 100;
     this.tailLength = 70;
