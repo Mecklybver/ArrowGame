@@ -1,25 +1,27 @@
-// prepositions.js
-
 const prepositionsList = [
-  "above",
-  "below",
-  "across",
-  "through",
+  "on",
+  "in",
   "under",
-  "over",
-  "behind",
-  "between",
-  "in front of",
   "next to",
-  "near",
-  "beside",
+  "in front of",
+  "behind",
+];
+
+const sounds = [
+  new Audio("./Audio/on.ogg"),
+  new Audio("./Audio/in.ogg"),
+  new Audio("./Audio/under.ogg"),
+  new Audio("./Audio/next_to.ogg"),
+  new Audio("./Audio/in_front_of.ogg"),
+  new Audio("./Audio/behind.ogg"),
 ];
 
 export default class Prepositions {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    this.text = "";
+    this.text = null
+    this.index = null; // ✅ New: track index of current word
     this.visible = false;
     this.x = 0;
     this.y = 0;
@@ -27,6 +29,7 @@ export default class Prepositions {
 
   showAboveArrow(arrow) {
     const randomIndex = Math.floor(Math.random() * prepositionsList.length);
+    this.index = randomIndex; // ✅ Save the index
     this.text = prepositionsList[randomIndex];
     this.visible = true;
     this.x = arrow.x;
@@ -35,6 +38,16 @@ export default class Prepositions {
 
   hide() {
     this.visible = false;
+  }
+
+  playSound() {
+    const sound = sounds[this.index]; 
+    if (sound) {
+      sound.currentTime = 0;
+      sound.play().catch((e) => {
+        console.warn("Audio playback failed:", e);
+      });
+    }
   }
 
   render() {

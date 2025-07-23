@@ -7,6 +7,9 @@ import { Number } from "./number.js";
 import { Color } from "./color.js";
 import Prepositions from "./prepositions.js";
 
+const img = new Image();
+img.src = "./Img/logo.jpeg";
+
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -176,14 +179,23 @@ function startArrowAnimation(interval = 80, duration = 3000) {
           if (navigator.vibrate) navigator.vibrate(50);
         }
       }
-    } else {
+      if (Level.mode === "prepositions") {
+        if (soundEnabled) {
+          prepositions.playSound();
+          if (navigator.vibrate) navigator.vibrate(50);
+        }
+      }
+    } 
+    else {
       // Animation loop
       run();
 
       // Handle prepositions during animation
       if (Level.mode === "prepositions") {
         prepositions.showAboveArrow(arrow);
-        if (soundEnabled && navigator.vibrate) navigator.vibrate(50);
+        if (soundEnabled && navigator.vibrate) {
+          navigator.vibrate(50); 
+        }
       } else {
         prepositions.hide();
       }
@@ -258,6 +270,7 @@ function drawSpeakerIcon(ctx, x, y, size, enabled) {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // ctx.drawImage(img, innerWidth * 0.5 - img.width * 0.5, innerHeight  - img.height - 20);
   if (arrow) arrow.render(ctx);
   button.render();
   level.render();
