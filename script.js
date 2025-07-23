@@ -5,6 +5,7 @@ import Level from "./level.js";
 import Word from "./word.js";
 import { Number } from "./number.js";
 import { Color } from "./color.js";
+import Prepositions from "./prepositions.js";
 
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
@@ -14,15 +15,23 @@ document.body.appendChild(canvas);
 
 let arrow = null;
 const button = new Button(canvas);
-const color = new Color()
+const color = new Color();
 const level = new Level(canvas);
 const numberLevel = new Number();
+const prepositions = new Prepositions(canvas);
 const words = [
   new Word(canvas), // top
   new Word(canvas), // bottom
   new Word(canvas), // left
   new Word(canvas), // right
 ];
+
+// Speaker toggle button parameters
+const speakerSize = 40;
+const speakerMargin = 20;
+let soundEnabled = true;
+let speakerX = speakerMargin;
+let speakerY = speakerMargin;
 
 let isAnimating = false;
 let pendingStart = false;
@@ -44,7 +53,7 @@ document.addEventListener("fullscreenchange", () => {
   }
 });
 
-const resize = () => {
+function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   if (arrow) {
@@ -53,7 +62,10 @@ const resize = () => {
   }
   button.updatePosition(canvas.width / 2, canvas.height / 2 + 100);
   level.updatePosition(canvas.width - level.width - 20, 20);
-};
+
+  speakerX = speakerMargin;
+  speakerY = speakerMargin;
+}
 window.addEventListener("resize", resize);
 resize();
 
@@ -62,6 +74,18 @@ canvas.addEventListener("pointerdown", (e) => {
   const pointerX = e.clientX - rect.left;
   const pointerY = e.clientY - rect.top;
 
+  // Check if speaker button clicked
+  if (
+    pointerX >= speakerX &&
+    pointerX <= speakerX + speakerSize &&
+    pointerY >= speakerY &&
+    pointerY <= speakerY + speakerSize
+  ) {
+    soundEnabled = !soundEnabled;
+    return;
+  }
+
+  // Check if main button clicked
   if (button.isClicked(pointerX, pointerY)) {
     if (button.label === "Play") {
       button.setLabel("Go");
@@ -78,20 +102,18 @@ canvas.addEventListener("pointerdown", (e) => {
   }
 });
 
-function startArrowAnimation() {
+function startArrowAnimation(interval = 80, duration = 3000) {
   isAnimating = true;
   words.forEach((word) => word.hide());
 
   let elapsed = 0;
-  const duration = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000;
-  let interval = Math.floor(Math.random() * (180 - 60 + 1)) + 60;
-  if (Level.mode === "numbers") interval = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
- 
-  
 
   const run = () => {
     arrow = new Arrow(canvas);
-    arrow.playTone();
+    if (soundEnabled) {
+      arrow.playTone();
+      if (navigator.vibrate) navigator.vibrate(50);
+    }
   };
 
   run();
@@ -104,9 +126,10 @@ function startArrowAnimation() {
       playFinalTone();
       isAnimating = false;
 
+      // Mode-specific behavior AFTER animation
       if (Level.mode === "hard") {
         const options = [
-          "😔   😔😔   😔",
+          "black",
           "yellow",
           "green",
           "purple",
@@ -137,20 +160,40 @@ function startArrowAnimation() {
           color,
           Math.PI / 2
         );
-      } else if (Level.mode === "numbers") {
-        arrow.color = "black";
-        numberLevel.playSound();
-      } else if (Level.mode === "easy") {
-          color.playAudio({ color: arrow.color, colors: arrow.colors });
+      }
 
+      if (Level.mode === "numbers") {
+        arrow.color = "black";
+        if (soundEnabled) {
+          numberLevel.playSound();
+          if (navigator.vibrate) navigator.vibrate(100);
+        }
+      }
+
+      if (Level.mode === "easy") {
+        if (soundEnabled) {
+          color.playAudio({ color: arrow.color, colors: arrow.colors });
+          if (navigator.vibrate) navigator.vibrate(50);
+        }
       }
     } else {
+      // Animation loop
       run();
+
+      // Handle prepositions during animation
+      if (Level.mode === "prepositions") {
+        prepositions.showAboveArrow(arrow);
+        if (soundEnabled && navigator.vibrate) navigator.vibrate(50);
+      } else {
+        prepositions.hide();
+      }
     }
   }, interval);
 }
 
 function playFinalTone() {
+  if (!soundEnabled) return;
+
   const oscillator = sharedAudioCtx.createOscillator();
   const gainNode = sharedAudioCtx.createGain();
 
@@ -169,14 +212,62 @@ function playFinalTone() {
   oscillator.stop(sharedAudioCtx.currentTime + 0.4);
 }
 
-// Main animation loop
-const animate = () => {
+function drawSpeakerIcon(ctx, x, y, size, enabled) {
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = enabled ? "black" : "gray";
+  ctx.fillStyle = enabled ? "black" : "gray";
+
+  // Speaker base
+  ctx.beginPath();
+  ctx.moveTo(x + size * 0.2, y + size * 0.3);
+  ctx.lineTo(x + size * 0.5, y + size * 0.3);
+  ctx.lineTo(x + size * 0.7, y + size * 0.1);
+  ctx.lineTo(x + size * 0.7, y + size * 0.9);
+  ctx.lineTo(x + size * 0.5, y + size * 0.7);
+  ctx.lineTo(x + size * 0.2, y + size * 0.7);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  if (enabled) {
+    // Sound waves
+    for (let i = 1; i <= 3; i++) {
+      ctx.beginPath();
+      ctx.arc(
+        x + size * 0.75,
+        y + size * 0.5,
+        size * 0.1 * i,
+        -Math.PI / 4,
+        Math.PI / 4
+      );
+      ctx.stroke();
+    }
+  } else {
+    // Muted icon
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x + size * 0.15, y + size * 0.85);
+    ctx.lineTo(x + size * 0.85, y + size * 0.15);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (arrow) arrow.render(ctx);
   button.render();
   level.render();
+  prepositions.render();
   words.forEach((word) => word.render());
+
+  // Speaker toggle
+  drawSpeakerIcon(ctx, speakerX, speakerY, speakerSize, soundEnabled);
+
   requestAnimationFrame(animate);
-};
+}
 
 animate();

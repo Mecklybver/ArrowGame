@@ -30,7 +30,7 @@ export default class Level {
       const mouseY = e.clientY - rect.top;
 
       if (this.isClicked(mouseX, mouseY)) {
-        const modes = ["easy", "hard", "numbers"];
+        const modes = ["easy", "hard", "numbers", "prepositions"];
         let currentIndex = modes.indexOf(Level.mode);
         currentIndex = (currentIndex + 1) % modes.length;
         Level.mode = modes[currentIndex];

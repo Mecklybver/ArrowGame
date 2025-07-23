@@ -4,16 +4,10 @@ import Level from "./level.js";
 
 export default class Arrow {
   constructor(canvas) {
+    this.canvas = canvas;
     this.direction = Math.random() < 0.5 ? "left" : "right";
     this.colors = ["black", "yellow", "green", "purple", "blue", "red", "pink"];
-    
-    this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-    if (Level.mode === "numbers") {
-      this.color = "black";
-    } else {
-      this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-    }
-
+    this.color = this.getRandomColor();
     this.size = 100;
     this.tailLength = 70;
     this.tailThickness = this.size / 4;
@@ -25,7 +19,34 @@ export default class Arrow {
     this.gap = 10;
   }
 
-  
+  getRandomColor() {
+    if (Level.mode === "numbers") return "black";
+    return this.colors[Math.floor(Math.random() * this.colors.length)];
+  }
+
+  setRandomDirectionAndColor() {
+    this.direction = Math.random() < 0.5 ? "left" : "right";
+    this.color = this.getRandomColor();
+    if(navigator.vibrate) navigator.vibrate(20);
+  }
+
+  startAnimation({ interval = 1000, duration = 5000, onEnd = () => {} }) {
+    let elapsed = 0;
+
+    const step = () => {
+      this.setRandomDirectionAndColor();
+      this.playTone();
+      elapsed += interval;
+
+      if (elapsed < duration) {
+        setTimeout(step, interval);
+      } else {
+        onEnd();
+      }
+    };
+
+    step();
+  }
 
   playTone() {
     const oscillator = sharedAudioCtx.createOscillator();
@@ -33,7 +54,7 @@ export default class Arrow {
 
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(110, sharedAudioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.9, sharedAudioCtx.currentTime); // slightly quieter
+    gainNode.gain.setValueAtTime(0.9, sharedAudioCtx.currentTime);
 
     oscillator.connect(gainNode);
     gainNode.connect(sharedAudioCtx.destination);
