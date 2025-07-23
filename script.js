@@ -43,9 +43,9 @@ function requestFullscreen() {
   if (canvas.requestFullscreen) {
     canvas.requestFullscreen();
   } else if (canvas.webkitRequestFullscreen) {
-    canvas.webkitRequestFullscreen(); // Safari
+    canvas.webkitRequestFullscreen();
   } else if (canvas.msRequestFullscreen) {
-    canvas.msRequestFullscreen(); // IE11
+    canvas.msRequestFullscreen();
   }
 }
 
@@ -92,15 +92,18 @@ canvas.addEventListener("pointerdown", (e) => {
   if (button.isClicked(pointerX, pointerY)) {
     if (button.label === "Play") {
       button.setLabel("Go");
+      return;
     }
 
-    if (isAnimating) return;
+    if (button.label === "Go") {
+      if (isAnimating) return;
 
-    if (!document.fullscreenElement) {
-      pendingStart = true;
-      requestFullscreen();
-    } else {
-      startArrowAnimation();
+      if (!document.fullscreenElement) {
+        pendingStart = true;
+        requestFullscreen();
+      } else {
+        startArrowAnimation();
+      }
     }
   }
 });
@@ -113,6 +116,12 @@ function startArrowAnimation(interval = 80, duration = 3000) {
 
   const run = () => {
     arrow = new Arrow(canvas);
+
+    // Make arrow black in prepositions mode
+    if (Level.mode === "prepositions") {
+      arrow.color = "black";
+    }
+
     if (soundEnabled) {
       arrow.playTone();
       if (navigator.vibrate) navigator.vibrate(50);
@@ -126,10 +135,14 @@ function startArrowAnimation(interval = 80, duration = 3000) {
     if (elapsed >= duration) {
       clearInterval(animInterval);
       arrow = new Arrow(canvas);
+
+      if (Level.mode === "prepositions") {
+        arrow.color = "black";
+      }
+
       playFinalTone();
       isAnimating = false;
 
-      // Mode-specific behavior AFTER animation
       if (Level.mode === "hard") {
         const options = [
           "black",
@@ -143,9 +156,7 @@ function startArrowAnimation(interval = 80, duration = 3000) {
         const text = options[Math.floor(Math.random() * options.length)];
         const color = arrow.color;
 
-        // Top
         words[0].setWord(text, canvas.width / 2, 40, color, 0);
-        // Bottom
         words[1].setWord(
           text,
           canvas.width / 2,
@@ -153,9 +164,7 @@ function startArrowAnimation(interval = 80, duration = 3000) {
           color,
           Math.PI
         );
-        // Left
         words[2].setWord(text, 40, canvas.height / 2, color, -Math.PI / 2);
-        // Right
         words[3].setWord(
           text,
           canvas.width - 40,
@@ -179,23 +188,20 @@ function startArrowAnimation(interval = 80, duration = 3000) {
           if (navigator.vibrate) navigator.vibrate(50);
         }
       }
+
       if (Level.mode === "prepositions") {
+        arrow.color = "black";
         if (soundEnabled) {
           prepositions.playSound();
           if (navigator.vibrate) navigator.vibrate(50);
         }
       }
-    } 
-    else {
-      // Animation loop
+    } else {
       run();
 
-      // Handle prepositions during animation
       if (Level.mode === "prepositions") {
         prepositions.showAboveArrow(arrow);
-        if (soundEnabled && navigator.vibrate) {
-          navigator.vibrate(50); 
-        }
+        if (soundEnabled && navigator.vibrate) navigator.vibrate(50);
       } else {
         prepositions.hide();
       }
@@ -230,7 +236,6 @@ function drawSpeakerIcon(ctx, x, y, size, enabled) {
   ctx.strokeStyle = enabled ? "black" : "gray";
   ctx.fillStyle = enabled ? "black" : "gray";
 
-  // Speaker base
   ctx.beginPath();
   ctx.moveTo(x + size * 0.2, y + size * 0.3);
   ctx.lineTo(x + size * 0.5, y + size * 0.3);
@@ -243,7 +248,6 @@ function drawSpeakerIcon(ctx, x, y, size, enabled) {
   ctx.stroke();
 
   if (enabled) {
-    // Sound waves
     for (let i = 1; i <= 3; i++) {
       ctx.beginPath();
       ctx.arc(
@@ -256,7 +260,6 @@ function drawSpeakerIcon(ctx, x, y, size, enabled) {
       ctx.stroke();
     }
   } else {
-    // Muted icon
     ctx.strokeStyle = "red";
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -270,14 +273,12 @@ function drawSpeakerIcon(ctx, x, y, size, enabled) {
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // ctx.drawImage(img, innerWidth * 0.5 - img.width * 0.5, innerHeight  - img.height - 20);
+
   if (arrow) arrow.render(ctx);
   button.render();
   level.render();
   prepositions.render();
   words.forEach((word) => word.render());
-
-  // Speaker toggle
   drawSpeakerIcon(ctx, speakerX, speakerY, speakerSize, soundEnabled);
 
   requestAnimationFrame(animate);
