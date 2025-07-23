@@ -8,12 +8,12 @@ const prepositionsList = [
 ];
 
 const sounds = [
-  new Audio("./Audio/on.ogg"),
-  new Audio("./Audio/in.ogg"),
-  new Audio("./Audio/under.ogg"),
-  new Audio("./Audio/next_to.ogg"),
-  new Audio("./Audio/in_front_of.ogg"),
-  new Audio("./Audio/behind.ogg"),
+  new Audio("./audio/on.ogg"),
+  new Audio("./audio/in.ogg"),
+  new Audio("./audio/under.ogg"),
+  new Audio("./audio/next_to.ogg"),
+  new Audio("./audio/in_front_of.ogg"),
+  new Audio("./audio/behind.ogg"),
 ];
 
 export default class Prepositions {
@@ -21,7 +21,7 @@ export default class Prepositions {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.text = null
-    this.index = null; // ✅ New: track index of current word
+    this.index = null; 
     this.visible = false;
     this.x = 0;
     this.y = 0;
