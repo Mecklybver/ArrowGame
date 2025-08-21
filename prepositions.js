@@ -20,8 +20,8 @@ export default class Prepositions {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    this.text = null
-    this.index = null; 
+    this.text = null;
+    this.index = null;
     this.visible = false;
     this.x = 0;
     this.y = 0;
@@ -41,7 +41,7 @@ export default class Prepositions {
   }
 
   playSound() {
-    const sound = sounds[this.index]; 
+    const sound = sounds[this.index];
     if (sound) {
       sound.currentTime = 0;
       sound.play().catch((e) => {
@@ -49,8 +49,7 @@ export default class Prepositions {
       });
     }
   }
-
-  render() {
+  render(position = "above") {
     if (!this.visible) return;
 
     const ctx = this.ctx;
@@ -58,7 +57,28 @@ export default class Prepositions {
     ctx.font = "bold 24px Arial";
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.fillText(this.text, this.x, this.y);
+
+    switch (position) {
+      case "above":
+        ctx.fillText(this.text, this.x, this.y -20);
+        break;
+      case "below":
+        ctx.translate(this.x, this.y + 220); // shift below arrow
+        ctx.rotate(Math.PI); // upside down
+        ctx.fillText(this.text, 0, 0);
+        break;
+      case "left":
+        ctx.translate(this.x - 150, this.y + 100); // shift left
+        ctx.rotate(-Math.PI / 2); // rotate 90° counterclockwise
+        ctx.fillText(this.text, 0, 0);
+        break;
+      case "right":
+        ctx.translate(this.x + 150, this.y + 100); // shift right
+        ctx.rotate(Math.PI / 2); // rotate 90° clockwise
+        ctx.fillText(this.text, 0, 0);
+        break;
+    }
+
     ctx.restore();
   }
 }

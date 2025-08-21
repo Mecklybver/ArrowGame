@@ -278,6 +278,10 @@ function animate() {
   button.render();
   level.render();
   prepositions.render();
+  prepositions.render("above");
+  prepositions.render("below");
+  prepositions.render("left");
+  prepositions.render("right");
   words.forEach((word) => word.render());
   drawSpeakerIcon(ctx, speakerX, speakerY, speakerSize, soundEnabled);
 
