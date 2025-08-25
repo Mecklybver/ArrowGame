@@ -108,7 +108,9 @@ canvas.addEventListener("pointerdown", (e) => {
   }
 });
 
-function startArrowAnimation(interval = 80, duration = 3000) {
+function startArrowAnimation(
+   interval = Math.floor(Math.random() * (100 - 60 + 1)) + 60, 
+  duration = Math.floor(Math.random() * (6000 - 2000 + 1)) + 2000) {
   isAnimating = true;
   words.forEach((word) => word.hide());
 
