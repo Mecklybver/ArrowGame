@@ -1,6 +1,6 @@
 export default class Level {
   static mode = "easy";
-  static numbersRange = "1-20"; // default range; only "1-20" or "1-90"
+  static numbersRange = "1-20"; // default range; only "1-20" or "1-100"
 
   constructor(canvas) {
     this.canvas = canvas;
@@ -63,7 +63,7 @@ export default class Level {
         mouseY >= this.extraY &&
         mouseY <= this.extraY + this.extraHeight
       ) {
-        Level.numbersRange = Level.numbersRange === "1-20" ? "1-90" : "1-20";
+        Level.numbersRange = Level.numbersRange === "1-20" ? "1-100" : "1-20";
       }
     });
   }

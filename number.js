@@ -35,13 +35,14 @@ export class Number {
       new Audio("./audio/70.ogg"),
       new Audio("./audio/80.ogg"),
       new Audio("./audio/90.ogg"),
+      new Audio("./audio/100.ogg"),
     ];
   }
 
   get audios() {
     if (Level.numbersRange === "1-20") {
       return this.audios1to20;
-    } else if (Level.numbersRange === "1-90") {
+    } else if (Level.numbersRange === "1-100") {
       // include both sets
       return [...this.audios1to20, ...this.audiosTens];
     }
